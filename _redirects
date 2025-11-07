@@ -1,0 +1,5 @@
+# Netlify redirects for SPA
+/*    /index.html   200
+
+# API proxy (optional - if you want to hide backend URL)
+/api/*  https://nlp-emotion-detection-clxd.onrender.com/api/:splat  200

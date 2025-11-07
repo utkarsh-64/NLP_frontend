@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Model Comparison - Mental Health Companion</title>
+    
+    <!-- Auth Check -->
+    <script>
+        (function() {
+            const token = localStorage.getItem('user_token');
+            if (!token) {
+                window.location.replace('login.html');
+            }
+        })();
+    </script>
+    
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(to bottom right, #f0f9ff, #e0e7ff);
+            min-height: 100vh;
+        }
+        .model-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 2px solid transparent;
+        }
+        .model-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        }
+        .model-card.best {
+            border-color: #10b981;
+            background: linear-gradient(to bottom right, #ffffff, #d1fae5);
+        }
+        .metric-bar {
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        .metric-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            transition: width 0.5s ease;
+        }
+        .metric-fill.high {
+            background: linear-gradient(90deg, #10b981, #059669);
+        }
+        .metric-fill.medium {
+            background: linear-gradient(90deg, #f59e0b, #d97706);
+        }
+        .metric-fill.low {
+            background: linear-gradient(90deg, #ef4444, #dc2626);
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .badge-best {
+            background: #10b981;
+            color: white;
+        }
+        .badge-transformer {
+            background: #8b5cf6;
+            color: white;
+        }
+        .badge-lexicon {
+            background: #f59e0b;
+            color: white;
+        }
+        .badge-classical {
+            background: #3b82f6;
+            color: white;
+        }
+        .comparison-table {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .comparison-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 16px;
+            font-weight: 600;
+        }
+        .comparison-table td {
+            padding: 16px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .comparison-table tr:hover {
+            background: #f9fafb;
+        }
+        .highlight-best {
+            background: #d1fae5 !important;
+            font-weight: 700;
+            color: #065f46;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-chart-bar text-purple-500 text-2xl"></i>
+                    <h1 class="text-xl font-bold text-gray-800">Model Comparison</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="index.html" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition">
+                        <i class="fas fa-comments mr-2"></i>
+                        Back to Chat
+                    </a>
+                    <button id="logoutBtn" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition">
+                        <i class="fas fa-sign-out-alt mr-2"></i>
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto p-6">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-gray-800 mb-4">
+                🧠 Emotion Detection Models Comparison
+            </h1>
+            <p class="text-lg text-gray-600">
+                Comprehensive analysis of 6 different AI models for mental health emotion detection
+            </p>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="grid md:grid-cols-3 gap-6 mb-12">
+            <div class="bg-white rounded-xl p-6 shadow-lg">
+                <div class="text-center">
+                    <div class="text-4xl mb-2">🏆</div>
+                    <h3 class="text-lg font-semibold text-gray-700">Best Overall</h3>
+                    <p class="text-2xl font-bold text-green-600 mt-2">Fine-tuned DistilBERT</p>
+                    <p class="text-sm text-gray-500 mt-1">F1-Score: 0.298</p>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl p-6 shadow-lg">
+                <div class="text-center">
+                    <div class="text-4xl mb-2">🎯</div>
+                    <h3 class="text-lg font-semibold text-gray-700">Highest Accuracy</h3>
+                    <p class="text-2xl font-bold text-blue-600 mt-2">Logistic Regression</p>
+                    <p class="text-sm text-gray-500 mt-1">Accuracy: 90.1%</p>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl p-6 shadow-lg">
+                <div class="text-center">
+                    <div class="text-4xl mb-2">📊</div>
+                    <h3 class="text-lg font-semibold text-gray-700">Models Tested</h3>
+                    <p class="text-2xl font-bold text-purple-600 mt-2">6 Models</p>
+                    <p class="text-sm text-gray-500 mt-1">3 Types: Lexicon, Transformer, Classical ML</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detailed Comparison Table -->
+        <div class="comparison-table mb-12">
+            <table class="w-full">
+                <thead>
+                    <tr>
+                        <th class="text-left">Model</th>
+                        <th class="text-left">Type</th>
+                        <th class="text-center">Accuracy (%)</th>
+                        <th class="text-center">Precision</th>
+                        <th class="text-center">Recall</th>
+                        <th class="text-center">F1-Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="font-semibold text-gray-800">VADER</div>
+                            <div class="text-sm text-gray-500">Valence Aware Dictionary</div>
+                        </td>
+                        <td>
+                            <span class="badge badge-lexicon">Lexicon-based</span>
+                        </td>
+                        <td class="text-center font-semibold">21.0</td>
+                        <td class="text-center">0.022</td>
+                        <td class="text-center">0.086</td>
+                        <td class="text-center">0.033</td>
+                    </tr>
+                    
+                    <tr>
+                        <td>
+                            <div class="font-semibold text-gray-800">TextBlob</div>
+                            <div class="text-sm text-gray-500">Pattern-based Analysis</div>
+                        </td>
+                        <td>
+                            <span class="badge badge-lexicon">Lexicon-based</span>
+                        </td>
+                        <td class="text-center font-semibold">18.0</td>
+                        <td class="text-center">0.020</td>
+                        <td class="text-center">0.080</td>
+                        <td class="text-center">0.030</td>
+                    </tr>
+                    
+                    <tr>
+                        <td>
+                            <div class="font-semibold text-gray-800">DistilBERT (Pre-trained)</div>
+                            <div class="text-sm text-gray-500">Base Transformer Model</div>
+                        </td>
+                        <td>
+                            <span class="badge badge-transformer">Transformer</span>
+                        </td>
+                        <td class="text-center font-semibold">89.0</td>
+                        <td class="text-center">0.055</td>
+                        <td class="text-center">0.156</td>
+                        <td class="text-center">0.078</td>
+                    </tr>
+                    
+                    <tr>
+                        <td>
+                            <div class="font-semibold text-gray-800">RoBERTa (Pre-trained)</div>
+                            <div class="text-sm text-gray-500">Robustly Optimized BERT</div>
+                        </td>
+                        <td>
+                            <span class="badge badge-transformer">Transformer</span>
+                        </td>
+                        <td class="text-center font-semibold">84.6</td>
+                        <td class="text-center">0.060</td>
+                        <td class="text-center">0.043</td>
+                        <td class="text-center">0.011</td>
+                    </tr>
+                    
+                    <tr class="highlight-best">
+                        <td>
+                            <div class="font-semibold text-gray-800 flex items-center">
+                                Fine-tuned DistilBERT (GoEmotions)
+                                <span class="badge badge-best ml-2">BEST</span>
+                            </div>
+                            <div class="text-sm text-gray-700">Optimized for Emotions</div>
+                        </td>
+                        <td>
+                            <span class="badge badge-transformer">Transformer (Fine-tuned)</span>
+                        </td>
+                        <td class="text-center font-bold">89.0</td>
+                        <td class="text-center font-bold">0.459</td>
+                        <td class="text-center font-bold">0.259</td>
+                        <td class="text-center font-bold">0.298</td>
+                    </tr>
+                    
+                    <tr class="highlight-best">
+                        <td>
+                            <div class="font-semibold text-gray-800 flex items-center">
+                                Logistic Regression (TF-IDF)
+                                <span class="badge badge-best ml-2">BEST</span>
+                            </div>
+                            <div class="text-sm text-gray-700">Classical ML Approach</div>
+                        </td>
+                        <td>
+                            <span class="badge badge-classical">Classical ML</span>
+                        </td>
+                        <td class="text-center font-bold">90.1</td>
+                        <td class="text-center font-bold">0.219</td>
+                        <td class="text-center font-bold">0.509</td>
+                        <td class="text-center font-bold">0.298</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Visual Comparison Cards -->
+        <h2 class="text-2xl font-bold text-gray-800 mb-6">📊 Detailed Model Analysis</h2>
+        
+        <div class="grid md:grid-cols-2 gap-6 mb-12">
+            <!-- Fine-tuned DistilBERT -->
+            <div class="model-card best">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold text-gray-800">Fine-tuned DistilBERT</h3>
+                    <span class="badge badge-best">🏆 BEST F1</span>
+                </div>
+                
+                <p class="text-sm text-gray-600 mb-4">
+                    Transformer model fine-tuned on GoEmotions dataset. Best balance of precision and recall.
+                </p>
+                
+                <div class="space-y-3">
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="font-semibold">Accuracy</span>
+                            <span class="font-bold text-green-600">89.0%</span>
+                        </div>
+                        <div class="metric-bar">
+                            <div class="metric-fill high" style="width: 89%"></div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="font-semibold">Precision</span>
+                            <span class="font-bold text-green-600">0.459</span>
+                        </div>
+                        <div class="metric-bar">
+                            <div class="metric-fill high" style="width: 45.9%"></div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="font-semibold">Recall</span>
+                            <span class="font-bold text-green-600">0.259</span>
+                        </div>
+                        <div class="metric-bar">
+                            <div class="metric-fill medium" style="width: 25.9%"></div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="font-semibold">F1-Score</span>
+                            <span class="font-bold text-green-600">0.298</span>
+                        </div>
+                        <div class="metric-bar">
+                            <div class="metric-fill high" style="width: 29.8%"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4 p-3 bg-green-50 rounded-lg">
+                    <p class="text-sm text-green-800">
+                        <strong>✅ Best for:</strong> Balanced emotion detection with high precision
+                    </p>
+                </div>
+            </div>
+
+            <!-- Logistic Regression -->
+            <div class="model-card best">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold text-gray-800">Logistic Regression</h3>
+                    <span class="badge badge-best">🎯 HIGHEST ACCURACY</span>
+                </div>
+                
+                <p class="text-sm text-gray-600 mb-4">
+                    Classical ML with TF-IDF features. Highest accuracy and recall for comprehensive detection.
+                </p>
+                
+                <div class="space-y-3">
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="font-semibold">Accuracy</span>
+                            <span class="font-bold text-green-600">90.1%</span>
+                        </div>
+                        <div class="metric-bar">
+                            <div class="metric-fill high" style="width: 90.1%"></div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="font-semibold">Precision</span>
+                            <span class="font-bold text-blue-600">0.219</span>
+                        </div>
+                        <div class="metric-bar">
+                            <div class="metric-fill medium" style="width: 21.9%"></div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="font-semibold">Recall</span>
+                            <span class="font-bold text-green-600">0.509</span>
+                        </div>
+                        <div class="metric-bar">
+                            <div class="metric-fill high" style="width: 50.9%"></div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="font-semibold">F1-Score</span>
+                            <span class="font-bold text-green-600">0.298</span>
+                        </div>
+                        <div class="metric-bar">
+                            <div class="metric-fill high" style="width: 29.8%"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4 p-3 bg-blue-50 rounded-lg">
+                    <p class="text-sm text-blue-800">
+                        <strong>✅ Best for:</strong> High recall - catches more emotions
+                    </p>
+                </div>
+            </div>
+
+            <!-- DistilBERT Pre-trained -->
+            <div class="model-card">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold text-gray-800">DistilBERT (Pre-trained)</h3>
+                    <span class="badge badge-transformer">Transformer</span>
+                </div>
+                
+                <p class="text-sm text-gray-600 mb-4">
+                    Base transformer model without fine-tuning. Good accuracy but lower F1-score.
+                </p>
+                
+                <div class="space-y-3">
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="font-semibold">Accuracy</span>
+                            <span class="font-bold">89.0%</span>
+                        </div>
+                        <div class="metric-bar">
+                            <div class="metric-fill high" style="width: 89%"></div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="font-semibold">F1-Score</span>
+                            <span class="font-bold">0.078</span>
+                        </div>
+                        <div class="metric-bar">
+                            <div class="metric-fill low" style="width: 7.8%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RoBERTa Pre-trained -->
+            <div class="model-card">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold text-gray-800">RoBERTa (Pre-trained)</h3>
+                    <span class="badge badge-transformer">Transformer</span>
+                </div>
+                
+                <p class="text-sm text-gray-600 mb-4">
+                    Robustly optimized BERT variant. Good accuracy but needs fine-tuning.
+                </p>
+                
+                <div class="space-y-3">
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="font-semibold">Accuracy</span>
+                            <span class="font-bold">84.6%</span>
+                        </div>
+                        <div class="metric-bar">
+                            <div class="metric-fill high" style="width: 84.6%"></div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="font-semibold">F1-Score</span>
+                            <span class="font-bold">0.011</span>
+                        </div>
+                        <div class="metric-bar">
+                            <div class="metric-fill low" style="width: 1.1%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VADER -->
+            <div class="model-card">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold text-gray-800">VADER</h3>
+                    <span class="badge badge-lexicon">Lexicon-based</span>
+                </div>
+                
+                <p class="text-sm text-gray-600 mb-4">
+                    Rule-based sentiment analysis. Fast but limited for complex emotions.
+                </p>
+                
+                <div class="space-y-3">
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="font-semibold">Accuracy</span>
+                            <span class="font-bold">21.0%</span>
+                        </div>
+                        <div class="metric-bar">
+                            <div class="metric-fill low" style="width: 21%"></div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="font-semibold">F1-Score</span>
+                            <span class="font-bold">0.033</span>
+                        </div>
+                        <div class="metric-bar">
+                            <div class="metric-fill low" style="width: 3.3%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TextBlob -->
+            <div class="model-card">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold text-gray-800">TextBlob</h3>
+                    <span class="badge badge-lexicon">Lexicon-based</span>
+                </div>
+                
+                <p class="text-sm text-gray-600 mb-4">
+                    Pattern-based analysis. Simple but not suitable for nuanced emotions.
+                </p>
+                
+                <div class="space-y-3">
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="font-semibold">Accuracy</span>
+                            <span class="font-bold">18.0%</span>
+                        </div>
+                        <div class="metric-bar">
+                            <div class="metric-fill low" style="width: 18%"></div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="font-semibold">F1-Score</span>
+                            <span class="font-bold">0.030</span>
+                        </div>
+                        <div class="metric-bar">
+                            <div class="metric-fill low" style="width: 3%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Insights -->
+        <div class="bg-white rounded-xl p-8 shadow-lg">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">🔍 Key Insights</h2>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="p-4 bg-green-50 rounded-lg">
+                    <h3 class="font-bold text-green-800 mb-2">✅ Best Performers</h3>
+                    <ul class="text-sm text-green-700 space-y-1">
+                        <li>• <strong>Fine-tuned DistilBERT:</strong> Best F1-score (0.298) - 7.6x improvement over baseline</li>
+                        <li>• <strong>Logistic Regression:</strong> Highest accuracy (90.1%) and recall (0.509)</li>
+                        <li>• Both models tied for best F1-score, making them ideal for production</li>
+                    </ul>
+                </div>
+                
+                <div class="p-4 bg-blue-50 rounded-lg">
+                    <h3 class="font-bold text-blue-800 mb-2">📈 Performance Trends</h3>
+                    <ul class="text-sm text-blue-700 space-y-1">
+                        <li>• <strong>Fine-tuning matters:</strong> Fine-tuned DistilBERT outperforms pre-trained by 3.8x</li>
+                        <li>• <strong>Classical ML competitive:</strong> Logistic Regression matches transformer performance</li>
+                        <li>• <strong>Lexicon-based limited:</strong> VADER and TextBlob struggle with complex emotions</li>
+                    </ul>
+                </div>
+                
+                <div class="p-4 bg-purple-50 rounded-lg">
+                    <h3 class="font-bold text-purple-800 mb-2">🎯 Use Cases</h3>
+                    <ul class="text-sm text-purple-700 space-y-1">
+                        <li>• <strong>High Precision:</strong> Use Fine-tuned DistilBERT (fewer false positives)</li>
+                        <li>• <strong>High Recall:</strong> Use Logistic Regression (catch more emotions)</li>
+                        <li>• <strong>Real-time:</strong> Both models are fast enough for production</li>
+                    </ul>
+                </div>
+                
+                <div class="p-4 bg-yellow-50 rounded-lg">
+                    <h3 class="font-bold text-yellow-800 mb-2">⚡ Implementation</h3>
+                    <ul class="text-sm text-yellow-700 space-y-1">
+                        <li>• <strong>Current System:</strong> Uses both models for comparison</li>
+                        <li>• <strong>Deployment:</strong> Models hosted on HuggingFace</li>
+                        <li>• <strong>Fallback:</strong> Keyword-based detection when APIs unavailable</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Logout functionality
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.clear();
+            sessionStorage.clear();
+            window.location.replace('login.html');
+        });
+    </script>
+</body>
+</html>

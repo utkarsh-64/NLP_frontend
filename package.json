@@ -1,0 +1,31 @@
+{
+  "name": "mental-health-companion",
+  "version": "1.0.0",
+  "description": "AI-powered mental health companion with emotion detection",
+  "main": "index.html",
+  "scripts": {
+    "dev": "http-server -p 3000 -o",
+    "start": "http-server -p 3000",
+    "build": "echo 'Static site - no build needed'",
+    "serve": "http-server -p 3000",
+    "preview": "http-server -p 3000 -o"
+  },
+  "keywords": [
+    "mental-health",
+    "ai",
+    "emotion-detection",
+    "therapy",
+    "wellness"
+  ],
+  "author": "Mental Health Companion Team",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  },
+  "dependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/mental-health-companion"
+  },
+  "homepage": "https://mental-health-companion.netlify.app"
+}

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Mental Health Companion</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .auth-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            max-width: 400px;
+            width: 100%;
+            margin: 20px;
+        }
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 12px 40px 12px 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .input-group i {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 600;
+            width: 100%;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        .password-strength {
+            height: 4px;
+            background: #e5e7eb;
+            border-radius: 2px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+        .password-strength-bar {
+            height: 100%;
+            width: 0%;
+            transition: all 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-card">
+        <div class="p-8">
+            <!-- Logo/Header -->
+            <div class="text-center mb-8">
+                <div class="text-5xl mb-3">💙</div>
+                <h1 class="text-2xl font-bold text-gray-800">Create Account</h1>
+                <p class="text-gray-600 mt-2">Step 1: Enter your email and password</p>
+            </div>
+
+            <!-- Error Message -->
+            <div id="errorMessage" class="error-message"></div>
+
+            <!-- Sign Up Form -->
+            <form id="signupForm">
+                <div class="input-group">
+                    <input 
+                        type="email" 
+                        id="email" 
+                        placeholder="Email address" 
+                        required
+                        autocomplete="email"
+                    >
+                    <i class="fas fa-envelope"></i>
+                </div>
+
+                <div class="input-group">
+                    <input 
+                        type="password" 
+                        id="password" 
+                        placeholder="Password (min 8 characters)" 
+                        required
+                        minlength="8"
+                        autocomplete="new-password"
+                    >
+                    <i class="fas fa-lock"></i>
+                    <div class="password-strength">
+                        <div id="passwordStrengthBar" class="password-strength-bar"></div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <input 
+                        type="password" 
+                        id="confirmPassword" 
+                        placeholder="Confirm password" 
+                        required
+                        autocomplete="new-password"
+                    >
+                    <i class="fas fa-lock"></i>
+                </div>
+
+                <div class="mb-6">
+                    <label class="flex items-start">
+                        <input type="checkbox" class="mr-2 mt-1" id="agreeTerms" required>
+                        <span class="text-sm text-gray-600">
+                            I agree to the <a href="#" class="text-purple-600">Terms of Service</a> and 
+                            <a href="#" class="text-purple-600">Privacy Policy</a>
+                        </span>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn-primary" id="submitBtn">
+                    <i class="fas fa-user-plus mr-2"></i>
+                    Continue to Profile Setup
+                </button>
+            </form>
+
+            <!-- Divider -->
+            <div class="flex items-center my-6">
+                <div class="flex-1 border-t border-gray-300"></div>
+                <span class="px-4 text-gray-500 text-sm">OR</span>
+                <div class="flex-1 border-t border-gray-300"></div>
+            </div>
+
+            <!-- Login Link -->
+            <div class="text-center">
+                <p class="text-gray-600">
+                    Already have an account? 
+                    <a href="login.html" class="text-purple-600 font-semibold hover:text-purple-800">Login</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const signupForm = document.getElementById('signupForm');
+        const errorMessage = document.getElementById('errorMessage');
+        const passwordInput = document.getElementById('password');
+        const passwordStrengthBar = document.getElementById('passwordStrengthBar');
+
+        // Password strength indicator
+        passwordInput.addEventListener('input', (e) => {
+            const password = e.target.value;
+            let strength = 0;
+
+            if (password.length >= 8) strength += 25;
+            if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength += 25;
+            if (password.match(/[0-9]/)) strength += 25;
+            if (password.match(/[^a-zA-Z0-9]/)) strength += 25;
+
+            passwordStrengthBar.style.width = strength + '%';
+            
+            if (strength < 50) {
+                passwordStrengthBar.style.background = '#ef4444';
+            } else if (strength < 75) {
+                passwordStrengthBar.style.background = '#f59e0b';
+            } else {
+                passwordStrengthBar.style.background = '#10b981';
+            }
+        });
+
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            console.log('📝 Signup form submitted');
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const agreeTerms = document.getElementById('agreeTerms').checked;
+
+            console.log('Email:', email);
+            console.log('Password length:', password.length);
+            console.log('Agreed to terms:', agreeTerms);
+
+            // Hide previous error
+            errorMessage.style.display = 'none';
+
+            // Validate terms agreement
+            if (!agreeTerms) {
+                errorMessage.textContent = 'Please agree to the Terms of Service and Privacy Policy';
+                errorMessage.style.display = 'block';
+                console.error('❌ Terms not agreed');
+                return;
+            }
+
+            // Validate passwords match
+            if (password !== confirmPassword) {
+                errorMessage.textContent = 'Passwords do not match';
+                errorMessage.style.display = 'block';
+                console.error('❌ Passwords do not match');
+                return;
+            }
+
+            // Validate password strength
+            if (password.length < 8) {
+                errorMessage.textContent = 'Password must be at least 8 characters';
+                errorMessage.style.display = 'block';
+                console.error('❌ Password too short');
+                return;
+            }
+
+            console.log('✅ Validation passed, storing credentials...');
+
+            // Store credentials temporarily and move to profile setup
+            sessionStorage.setItem('signup_email', email);
+            sessionStorage.setItem('signup_password', password);
+
+            console.log('✅ Credentials stored, redirecting...');
+
+            // Show loading state
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Redirecting...';
+
+            // Redirect to profile setup
+            setTimeout(() => {
+                window.location.href = 'profile-setup.html';
+            }, 500);
+        });
+    </script>
+</body>
+</html>

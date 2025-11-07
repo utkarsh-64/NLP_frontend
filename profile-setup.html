@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Setup - Mental Health Companion</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .auth-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            max-width: 500px;
+            width: 100%;
+            margin: 20px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        .input-group label {
+            display: block;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 600;
+            width: 100%;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        .btn-secondary {
+            background: #e5e7eb;
+            color: #374151;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 600;
+            width: 100%;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        .progress-bar {
+            height: 4px;
+            background: #e5e7eb;
+            border-radius: 2px;
+            margin-bottom: 20px;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            width: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 2px;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-card">
+        <div class="p-8">
+            <!-- Progress Bar -->
+            <div class="progress-bar">
+                <div class="progress-bar-fill"></div>
+            </div>
+
+            <!-- Logo/Header -->
+            <div class="text-center mb-8">
+                <div class="text-5xl mb-3">👤</div>
+                <h1 class="text-2xl font-bold text-gray-800">Complete Your Profile</h1>
+                <p class="text-gray-600 mt-2">Step 2: Tell us about yourself (confidential)</p>
+            </div>
+
+            <!-- Error Message -->
+            <div id="errorMessage" class="error-message"></div>
+
+            <!-- Profile Form -->
+            <form id="profileForm">
+                <div class="input-group">
+                    <label for="name">
+                        <i class="fas fa-user mr-2 text-purple-600"></i>
+                        Full Name
+                    </label>
+                    <input 
+                        type="text" 
+                        id="name" 
+                        placeholder="Enter your full name" 
+                        required
+                        autocomplete="name"
+                    >
+                </div>
+
+                <div class="input-group">
+                    <label for="age">
+                        <i class="fas fa-birthday-cake mr-2 text-purple-600"></i>
+                        Age
+                    </label>
+                    <input 
+                        type="number" 
+                        id="age" 
+                        placeholder="Enter your age" 
+                        required
+                        min="13"
+                        max="120"
+                    >
+                </div>
+
+                <div class="input-group">
+                    <label for="gender">
+                        <i class="fas fa-venus-mars mr-2 text-purple-600"></i>
+                        Gender
+                    </label>
+                    <select id="gender" required>
+                        <option value="">Select your gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="non-binary">Non-binary</option>
+                        <option value="prefer-not-to-say">Prefer not to say</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="country">
+                        <i class="fas fa-globe mr-2 text-purple-600"></i>
+                        Country (Optional)
+                    </label>
+                    <input 
+                        type="text" 
+                        id="country" 
+                        placeholder="Enter your country"
+                        autocomplete="country"
+                    >
+                </div>
+
+                <div class="input-group">
+                    <label for="mentalHealthGoals">
+                        <i class="fas fa-heart mr-2 text-purple-600"></i>
+                        What brings you here? (Optional)
+                    </label>
+                    <select id="mentalHealthGoals">
+                        <option value="">Select your primary goal</option>
+                        <option value="anxiety">Managing anxiety</option>
+                        <option value="depression">Dealing with depression</option>
+                        <option value="stress">Stress management</option>
+                        <option value="relationships">Relationship issues</option>
+                        <option value="self-improvement">Self-improvement</option>
+                        <option value="general-support">General emotional support</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <!-- Privacy Notice -->
+                <div class="bg-blue-50 p-4 rounded-lg mb-6">
+                    <p class="text-sm text-blue-800">
+                        <i class="fas fa-lock mr-2"></i>
+                        <strong>Your privacy matters:</strong> All information is encrypted and confidential. 
+                        We never share your personal data.
+                    </p>
+                </div>
+
+                <button type="submit" class="btn-primary" id="submitBtn">
+                    <i class="fas fa-check mr-2"></i>
+                    Complete Registration
+                </button>
+
+                <button type="button" class="btn-secondary" onclick="history.back()">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Back
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const profileForm = document.getElementById('profileForm');
+        const errorMessage = document.getElementById('errorMessage');
+        const submitBtn = document.getElementById('submitBtn');
+
+        // Check if user came from signup page
+        const email = sessionStorage.getItem('signup_email');
+        const password = sessionStorage.getItem('signup_password');
+
+        if (!email || !password) {
+            window.location.href = 'signup.html';
+        }
+
+        profileForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value;
+            const age = parseInt(document.getElementById('age').value);
+            const gender = document.getElementById('gender').value;
+            const country = document.getElementById('country').value;
+            const mentalHealthGoals = document.getElementById('mentalHealthGoals').value;
+
+            // Hide previous error
+            errorMessage.style.display = 'none';
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Creating account...';
+
+            console.log('📝 Submitting registration...');
+            console.log('Email:', email);
+            console.log('Name:', name);
+            console.log('Age:', age);
+            console.log('Gender:', gender);
+
+            try {
+                // Always use Render backend (since you're deploying there)
+                const API_URL = 'https://nlp-emotion-detection-clxd.onrender.com/api/auth/register';
+                
+                console.log('🌐 API URL:', API_URL);
+                console.log('⏳ Waiting for Render backend...');
+
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email,
+                        password,
+                        name,
+                        age,
+                        gender,
+                        country,
+                        mental_health_goals: mentalHealthGoals
+                    })
+                });
+
+                console.log('📡 Response status:', response.status);
+                
+                const data = await response.json();
+                console.log('📦 Response data:', data);
+
+                if (data.success) {
+                    // Clear session storage
+                    sessionStorage.removeItem('signup_email');
+                    sessionStorage.removeItem('signup_password');
+
+                    // Store user data
+                    localStorage.setItem('user_token', data.token);
+                    localStorage.setItem('user_id', data.user_id);
+                    localStorage.setItem('user_email', email);
+                    localStorage.setItem('user_name', name);
+
+                    // Show success and redirect
+                    submitBtn.innerHTML = '<i class="fas fa-check mr-2"></i>Success! Redirecting...';
+                    
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1500);
+                } else {
+                    errorMessage.textContent = data.message || 'Registration failed. Please try again.';
+                    errorMessage.style.display = 'block';
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-check mr-2"></i>Complete Registration';
+                }
+            } catch (error) {
+                console.error('❌ Registration error:', error);
+                console.error('Error details:', error.message);
+                
+                let errorMsg = 'Registration failed. ';
+                
+                if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+                    errorMsg += 'Cannot connect to server. The backend might be starting up (Render takes 30-60 seconds). Please wait and try again.';
+                } else {
+                    errorMsg += 'Please try again.';
+                }
+                
+                errorMessage.textContent = errorMsg;
+                errorMessage.style.display = 'block';
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-check mr-2"></i>Complete Registration';
+            }
+        });
+    </script>
+</body>
+</html>

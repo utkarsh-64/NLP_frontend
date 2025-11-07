@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Mental Health Companion</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .auth-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            max-width: 400px;
+            width: 100%;
+            margin: 20px;
+        }
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 12px 40px 12px 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .input-group i {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 600;
+            width: 100%;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        .success-message {
+            background: #efe;
+            color: #3c3;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-card">
+        <div class="p-8">
+            <!-- Logo/Header -->
+            <div class="text-center mb-8">
+                <div class="text-5xl mb-3">💙</div>
+                <h1 class="text-2xl font-bold text-gray-800">Mental Health Companion</h1>
+                <p class="text-gray-600 mt-2">Welcome back! Please login to continue</p>
+            </div>
+
+            <!-- Error/Success Messages -->
+            <div id="errorMessage" class="error-message"></div>
+            <div id="successMessage" class="success-message"></div>
+
+            <!-- Login Form -->
+            <form id="loginForm">
+                <div class="input-group">
+                    <input 
+                        type="email" 
+                        id="email" 
+                        placeholder="Email address" 
+                        required
+                        autocomplete="email"
+                    >
+                    <i class="fas fa-envelope"></i>
+                </div>
+
+                <div class="input-group">
+                    <input 
+                        type="password" 
+                        id="password" 
+                        placeholder="Password" 
+                        required
+                        autocomplete="current-password"
+                    >
+                    <i class="fas fa-lock"></i>
+                </div>
+
+                <div class="flex items-center justify-between mb-6">
+                    <label class="flex items-center">
+                        <input type="checkbox" class="mr-2" id="rememberMe">
+                        <span class="text-sm text-gray-600">Remember me</span>
+                    </label>
+                    <a href="#" class="text-sm text-purple-600 hover:text-purple-800">Forgot password?</a>
+                </div>
+
+                <button type="submit" class="btn-primary">
+                    <i class="fas fa-sign-in-alt mr-2"></i>
+                    Login
+                </button>
+            </form>
+
+            <!-- Divider -->
+            <div class="flex items-center my-6">
+                <div class="flex-1 border-t border-gray-300"></div>
+                <span class="px-4 text-gray-500 text-sm">OR</span>
+                <div class="flex-1 border-t border-gray-300"></div>
+            </div>
+
+            <!-- Sign Up Link -->
+            <div class="text-center">
+                <p class="text-gray-600">
+                    Don't have an account? 
+                    <a href="signup.html" class="text-purple-600 font-semibold hover:text-purple-800">Sign up</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const loginForm = document.getElementById('loginForm');
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+
+        // Check if user is already logged in
+        if (localStorage.getItem('user_token')) {
+            window.location.href = 'index.html';
+        }
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const rememberMe = document.getElementById('rememberMe').checked;
+
+            // Hide previous messages
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
+
+            try {
+                // Always use Render backend (since you're deploying there)
+                const API_URL = 'https://nlp-emotion-detection-clxd.onrender.com/api/auth/login';
+                
+                console.log('🌐 Logging in to:', API_URL);
+                console.log('⏳ Waiting for Render backend...');
+
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Store user data
+                    localStorage.setItem('user_token', data.token);
+                    localStorage.setItem('user_id', data.user_id);
+                    localStorage.setItem('user_email', email);
+                    
+                    if (rememberMe) {
+                        localStorage.setItem('remember_me', 'true');
+                    }
+
+                    // Show success message
+                    successMessage.textContent = 'Login successful! Redirecting...';
+                    successMessage.style.display = 'block';
+
+                    // Redirect to main app
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1000);
+                } else {
+                    errorMessage.textContent = data.message || 'Invalid email or password';
+                    errorMessage.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                
+                let errorMsg = 'Login failed. ';
+                
+                if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+                    errorMsg += 'Cannot connect to server. The backend might be starting up (Render takes 30-60 seconds). Please wait and try again.';
+                } else {
+                    errorMsg += 'Please try again.';
+                }
+                
+                errorMessage.textContent = errorMsg;
+                errorMessage.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

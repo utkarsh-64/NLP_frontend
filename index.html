@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AI-powered mental health companion with emotion detection and empathetic responses">
+    <meta name="keywords" content="mental health, emotion detection, AI companion, therapy, wellness">
+    <meta name="author" content="Mental Health Companion">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#3b82f6">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='40' fill='%233b82f6'/%3E%3Ctext x='50' y='60' font-size='40' text-anchor='middle' fill='white'%3E💙%3C/text%3E%3C/svg%3E">
+    
+    <title>Mental Health Companion - AI-Powered Emotional Support</title>
+    
+    <!-- Auth Check - MUST BE FIRST -->
+    <script>
+        // Check authentication IMMEDIATELY before page loads
+        (function() {
+            const token = localStorage.getItem('user_token');
+            if (!token) {
+                // Redirect to login if not authenticated
+                window.location.replace('login.html');
+            }
+        })();
+    </script>
+    
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-heart text-pink-500 text-2xl"></i>
+                    <h1 class="text-xl font-bold text-gray-800">Mental Health Companion</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="models.html" class="bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition" title="View model comparison">
+                        <i class="fas fa-chart-bar mr-2"></i>
+                        Models
+                    </a>
+                    <button id="helpButton" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition" title="Show help and keyboard shortcuts">
+                        <i class="fas fa-question-circle mr-2"></i>
+                        Help
+                    </button>
+                    <button id="modelToggle" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition" title="Switch AI model (Alt+M)">
+                        <i class="fas fa-brain mr-2"></i>
+                        <span id="currentModel">DistilBERT</span>
+                    </button>
+                    <button id="audioToggle" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition" title="Toggle audio responses (Alt+A)">
+                        <i class="fas fa-volume-up mr-2"></i>
+                        Audio: ON
+                    </button>
+                    <button id="logoutBtn" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition" title="Logout">
+                        <i class="fas fa-sign-out-alt mr-2"></i>
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="max-w-4xl mx-auto p-4">
+        <!-- Chat Container -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <!-- Chat Header -->
+            <div class="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6">
+                <h2 class="text-2xl font-bold mb-2">How are you feeling today?</h2>
+                <p class="opacity-90">I'm here to listen and support you. Share what's on your mind.</p>
+            </div>
+
+            <!-- Chat Messages -->
+            <div id="chatMessages" class="h-96 overflow-y-auto p-6 space-y-4">
+                <!-- Welcome Message -->
+                <div class="flex items-start space-x-3">
+                    <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                        <i class="fas fa-robot text-white text-sm"></i>
+                    </div>
+                    <div class="bg-blue-50 rounded-lg p-4 max-w-md">
+                        <p class="text-gray-800">Hello! I'm your mental health companion. I can detect emotions in your messages and provide supportive responses. How are you feeling right now?</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Emotion Display -->
+            <div id="emotionDisplay" class="px-6 py-3 bg-gray-50 border-t hidden">
+                <div class="flex items-center space-x-2 mb-2">
+                    <i class="fas fa-brain text-purple-500"></i>
+                    <span class="font-semibold text-gray-700">Detected Emotions:</span>
+                </div>
+                <div id="emotionTags" class="flex flex-wrap gap-2">
+                    <!-- Emotion tags will be inserted here -->
+                </div>
+            </div>
+
+            <!-- Chat Input -->
+            <div class="p-6 border-t bg-gray-50">
+                <div class="flex space-x-3">
+                    <input 
+                        type="text" 
+                        id="messageInput" 
+                        placeholder="Type your message here... (Ctrl+Enter to send)" 
+                        class="flex-1 border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        maxlength="500"
+                        aria-label="Message input"
+                        autocomplete="off"
+                    >
+                    <button 
+                        id="sendButton" 
+                        class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                        aria-label="Send message"
+                        title="Send message (Ctrl+Enter)"
+                    >
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+                <div class="flex justify-between items-center mt-2 text-sm text-gray-500">
+                    <span id="charCount">0/500</span>
+                    <div class="flex items-center space-x-4">
+                        <span id="connectionStatus" class="flex items-center">
+                            <div class="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                            Connected
+                        </span>
+                        <span id="processingTime" class="hidden">
+                            <i class="fas fa-clock mr-1"></i>
+                            <span id="timeValue">0ms</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <div class="grid md:grid-cols-2 gap-6 mt-6">
+            <!-- Model Information -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-lg font-bold text-gray-800 mb-4">
+                    <i class="fas fa-cog text-blue-500 mr-2"></i>
+                    Model Information
+                </h3>
+                <div id="modelInfo" class="space-y-3">
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Current Model:</span>
+                        <span id="modelName" class="font-semibold">Enhanced DistilBERT</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Type:</span>
+                        <span id="modelType" class="font-semibold">Transformer</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Audio Controls -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-lg font-bold text-gray-800 mb-4">
+                    <i class="fas fa-volume-up text-green-500 mr-2"></i>
+                    Audio Controls
+                </h3>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-600">Audio Responses:</span>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="audioEnabled" class="sr-only peer" checked>
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-600">Speech Rate:</span>
+                        <input type="range" id="speechRate" min="0.5" max="2" step="0.1" value="1" class="w-24">
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-600">Volume:</span>
+                        <input type="range" id="volume" min="0" max="1" step="0.1" value="0.8" class="w-24">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- YouTube Integration -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mt-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">
+                <i class="fab fa-youtube text-red-500 mr-2"></i>
+                Therapeutic Content
+            </h3>
+            <div id="videoRecommendations" class="grid md:grid-cols-2 gap-4">
+                <!-- Video recommendations will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Help Modal -->
+    <div id="helpModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-lg p-6 max-w-md mx-4 max-h-96 overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-gray-800">
+                    <i class="fas fa-question-circle text-purple-500 mr-2"></i>
+                    Help & Shortcuts
+                </h3>
+                <button id="closeHelp" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-4 text-sm">
+                <div>
+                    <h4 class="font-semibold text-gray-700 mb-2">Keyboard Shortcuts</h4>
+                    <ul class="space-y-1 text-gray-600">
+                        <li><kbd class="bg-gray-100 px-2 py-1 rounded">Ctrl+Enter</kbd> Send message</li>
+                        <li><kbd class="bg-gray-100 px-2 py-1 rounded">Alt+M</kbd> Switch AI model</li>
+                        <li><kbd class="bg-gray-100 px-2 py-1 rounded">Alt+A</kbd> Toggle audio</li>
+                        <li><kbd class="bg-gray-100 px-2 py-1 rounded">Escape</kbd> Stop audio</li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold text-gray-700 mb-2">Features</h4>
+                    <ul class="space-y-1 text-gray-600">
+                        <li>• Real-time emotion detection</li>
+                        <li>• Audio responses with TTS</li>
+                        <li>• Two AI models to choose from</li>
+                        <li>• Therapeutic video recommendations</li>
+                        <li>• Offline support</li>
+                        <li>• Mobile responsive design</li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold text-gray-700 mb-2">Privacy</h4>
+                    <p class="text-gray-600">Your conversations are processed securely. No personal data is permanently stored.</p>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold text-gray-700 mb-2">Crisis Support</h4>
+                    <p class="text-gray-600">If you're in crisis, please contact:</p>
+                    <ul class="text-gray-600 mt-1">
+                        <li>• Emergency: 911</li>
+                        <li>• Crisis Text Line: Text HOME to 741741</li>
+                        <li>• National Suicide Prevention Lifeline: 988</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-lg p-6 flex items-center space-x-3">
+            <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+            <span class="text-gray-700">Processing your message...</span>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="script.js?v=2.0"></script>
+</body>
+</html>
